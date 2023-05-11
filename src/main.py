@@ -19,27 +19,13 @@ basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level
 def main() -> None:
     application = ApplicationBuilder().token(TOKEN).build()
 
-    start_handler = CommandHandler("start", start)
-    application.add_handler(start_handler)
-
-    talk_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), talk)
-    application.add_handler(talk_handler)
-
-    reset_handler = CommandHandler("reset", reset)
-    application.add_handler(reset_handler)
-
-    prompt_set_handler = CommandHandler("promptset", prompt_set)
-    application.add_handler(prompt_set_handler)
-
-    prompt_reset_handler = CommandHandler("promptreset", prompt_reset)
-    application.add_handler(prompt_reset_handler)
-
-    prompt_get_handler = CommandHandler("promptget", prompt_get)
-    application.add_handler(prompt_get_handler)
-
-    prompt_remove_handler = CommandHandler("promptremove", prompt_remove)
-    application.add_handler(prompt_remove_handler)
-
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), talk))
+    application.add_handler(CommandHandler("reset", reset))
+    application.add_handler(CommandHandler("promptset", prompt_set))
+    application.add_handler(CommandHandler("promptreset", prompt_reset))
+    application.add_handler(CommandHandler("promptget", prompt_get))
+    application.add_handler(CommandHandler("promptremove", prompt_remove))
     application.add_error_handler(rate_error_handler)
 
     application.run_polling()
