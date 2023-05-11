@@ -1,4 +1,4 @@
-from logging import INFO, basicConfig
+from logging import DEBUG, basicConfig
 from os import getenv
 
 from dotenv import load_dotenv
@@ -13,7 +13,7 @@ load_dotenv()
 
 TOKEN = getenv("BOT_TOKEN")
 
-basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=INFO)
+basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=DEBUG)
 
 
 def main() -> None:
