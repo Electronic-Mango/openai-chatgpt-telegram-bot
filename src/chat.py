@@ -24,13 +24,13 @@ custom_prompts = defaultdict(lambda: initial_prompt)
 openai.api_key = TOKEN
 
 
-def initial_message(channel_id: int) -> str | None:
-    return next_message(channel_id, None)
+def initial_message(chat_id: int) -> str | None:
+    return next_message(chat_id, None)
 
 
-def next_message(channel_id: int, text: str) -> str:
-    prompt = custom_prompts[channel_id]
-    conversation = conversations[channel_id]
+def next_message(chat_id: int, text: str) -> str:
+    prompt = custom_prompts[chat_id]
+    conversation = conversations[chat_id]
     new_message = Message("user", text)
     messages = [message._asdict() for message in [*prompt, *conversation, new_message] if message.content]
     response = _get_response(messages)
@@ -42,25 +42,25 @@ def next_message(channel_id: int, text: str) -> str:
     return response_message.content
 
 
-def reset_conversation(channel_id: int) -> None:
-    conversations.pop(channel_id, None)
+def reset_conversation(chat_id: int) -> None:
+    conversations.pop(chat_id, None)
 
 
-def store_custom_prompt(channel_id: int, prompt: str) -> None:
-    custom_prompts[channel_id] = [Message("system", prompt), Message("user", prompt)]
+def store_custom_prompt(chat_id: int, prompt: str) -> None:
+    custom_prompts[chat_id] = [Message("system", prompt), Message("user", prompt)]
 
 
-def remove_custom_prompt(channel_id: int) -> None:
-    if channel_id in custom_prompts:
-        custom_prompts.pop(channel_id, None)
+def remove_custom_prompt(chat_id: int) -> None:
+    if chat_id in custom_prompts:
+        custom_prompts.pop(chat_id, None)
 
 
-def remove_prompt(channel_id: int) -> None:
-    store_custom_prompt(channel_id, None)
+def remove_prompt(chat_id: int) -> None:
+    store_custom_prompt(chat_id, None)
 
 
-def get_custom_prompt(channel_id: int) -> str | None:
-    return custom_prompts[channel_id][-1].content if channel_id in custom_prompts else None
+def get_custom_prompt(chat_id: int) -> str | None:
+    return custom_prompts[chat_id][-1].content if chat_id in custom_prompts else None
 
 
 def _get_response(messages: list[dict[str, str]]):
