@@ -25,12 +25,12 @@ openai.api_key = TOKEN
 
 
 def initial_message(chat_id: int) -> str | None:
-    return next_message(chat_id, None)
+    return next_message(chat_id, None, False)
 
 
-def next_message(chat_id: int, text: str) -> str:
+def next_message(chat_id: int, text: str, use_conversation: bool = True) -> str:
     prompt = custom_prompts[chat_id]
-    conversation = conversations[chat_id]
+    conversation = conversations[chat_id] if use_conversation else []
     new_message = Message("user", text)
     messages = [message._asdict() for message in [*prompt, *conversation, new_message] if message.content]
     response = _get_response(messages)
