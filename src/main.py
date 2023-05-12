@@ -55,7 +55,7 @@ async def prompt_set(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     reset_conversation(chat_id)
     new_prompt = " ".join(context.args)
     store_custom_prompt(chat_id, new_prompt)
-    await context.bot.send_message(chat_id=chat_id, text=f"Prompt set to: *{new_prompt}*", parse_mode="MarkdownV2")
+    await context.bot.send_message(chat_id=chat_id, text=f"Prompt set to: {new_prompt}")
 
 
 async def prompt_reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -68,8 +68,8 @@ async def prompt_reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def prompt_get(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_chat.id
     custom_prompt = get_custom_prompt(chat_id)
-    response = f"Prompt set to: *{custom_prompt}*" if custom_prompt else "No custom prompt configured."
-    await context.bot.send_message(chat_id=chat_id, text=response, parse_mode="MarkdownV2")
+    response = f"Prompt set to: {custom_prompt}" if custom_prompt else "No custom prompt configured."
+    await context.bot.send_message(chat_id=chat_id, text=response)
 
 
 async def prompt_remove(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
