@@ -25,7 +25,7 @@ openai.api_key = TOKEN
 
 
 def initial_message(chat_id: int) -> str | None:
-    return next_message(chat_id, None, False)
+    return next_message(chat_id, "Show a welcome message explaining who you are and what you can do.", False)
 
 
 def next_message(chat_id: int, text: str, use_conversation: bool = True) -> str:
