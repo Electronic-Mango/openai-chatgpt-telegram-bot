@@ -67,12 +67,11 @@ OPENAI_INITIAL_MESSAGE='You are a helpful assistant acting like 18th century but
 
 * `/start` - prints initial message returned from the model for just system message and optional initial message, doesn't impact conversation context
 * `/reset` - resets current conversation and removes all context, other than system message
-* `/promptset <new prompt>` - set new custom prompt, changes both system message and custom initial message (overwrites both `OPENAI_SYSTEM_MESSAGE` and `OPENAI_INITIAL_MESSAGE`)
+* `/promptset` - set new custom prompt, changes both system message and custom initial message (overwrites both `OPENAI_SYSTEM_MESSAGE` and `OPENAI_INITIAL_MESSAGE`)
 * `/promptreset` - restore prompt to default
 * `/promptget` - get custom prompt, won't respond with default one to avoid leaking configuration to users
 * `/promptremove` - force-remove any prompts from the conversation, including one defined in configuration files
-
-Note that `promptset` requires to pass the new prompt as a argument, which might not work well with command menu.
+* `/cancel` - cancels ongoing operation, applies only to `/promptset`
 
 
 ## Running the bot

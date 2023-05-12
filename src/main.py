@@ -3,7 +3,7 @@ from os import getenv
 
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, ContextTypes, MessageHandler
 from telegram.ext.filters import COMMAND, TEXT
 
 from chat import (get_custom_prompt, initial_message, next_message, remove_custom_prompt, remove_prompt,
@@ -11,74 +11,91 @@ from chat import (get_custom_prompt, initial_message, next_message, remove_custo
 from rate_error_handler import rate_error_handler
 from user_filer import user_filter
 
-load_dotenv()
-
-TOKEN = getenv("BOT_TOKEN")
-
-basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=DEBUG)
+INPUT_PROMPT_STATE = range(1)
 
 
 def main() -> None:
-    application = ApplicationBuilder().token(TOKEN).build()
-
-    application.add_handler(CommandHandler("start", start, user_filter))
-    application.add_handler(MessageHandler(user_filter & TEXT & (~COMMAND), talk))
-    application.add_handler(CommandHandler("reset", reset, user_filter))
-    application.add_handler(CommandHandler("promptset", prompt_set, user_filter))
-    application.add_handler(CommandHandler("promptreset", prompt_reset, user_filter))
-    application.add_handler(CommandHandler("promptget", prompt_get, user_filter))
-    application.add_handler(CommandHandler("promptremove", prompt_remove, user_filter))
-    application.add_error_handler(rate_error_handler)
-
-    application.run_polling()
-
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    chat_id = update.effective_chat.id
-    message = initial_message(chat_id)
-    await context.bot.send_message(chat_id=chat_id, text=message)
+    load_dotenv()
+    basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=DEBUG)
+    bot = ApplicationBuilder().token(getenv("BOT_TOKEN")).build()
+    bot.add_handler(CommandHandler("start", start, user_filter))
+    bot.add_handler(CommandHandler("restart", restart, user_filter))
+    bot.add_handler(prompt_set_handler())
+    bot.add_handler(CommandHandler("promptresetarg", prompt_reset, user_filter))
+    bot.add_handler(CommandHandler("promptget", prompt_get, user_filter))
+    bot.add_handler(CommandHandler("promptremove", prompt_remove, user_filter))
+    bot.add_handler(CommandHandler("cancel", cancel, user_filter))
+    bot.add_handler(MessageHandler(user_filter & TEXT & ~COMMAND, talk))
+    bot.add_error_handler(rate_error_handler)
+    bot.run_polling()
 
 
-async def talk(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    chat_id = update.effective_chat.id
-    response = next_message(chat_id, update.message.text)
-    await context.bot.send_message(chat_id=chat_id, text=response)
+async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    message = initial_message(update.effective_chat.id)
+    await update.message.reply_text(message)
 
 
-async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    chat_id = update.effective_chat.id
-    reset_conversation(chat_id)
-    await context.bot.send_message(chat_id=chat_id, text="Conversation restarted.")
+async def restart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    reset_conversation(update.effective_chat.id)
+    await update.message.reply_text("Conversation restarted.")
     await start(update, context)
 
 
-async def prompt_set(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    chat_id = update.effective_chat.id
-    reset_conversation(chat_id)
-    new_prompt = " ".join(context.args)
-    store_custom_prompt(chat_id, new_prompt)
-    await context.bot.send_message(chat_id=chat_id, text=f"Prompt set to: {new_prompt}")
+def prompt_set_handler() -> ConversationHandler:
+    entry_handler = CommandHandler("promptset", prompt_set)
+    new_prompt_handler = MessageHandler(user_filter & TEXT & ~COMMAND, handle_new_prompt)
+    cancel_handler = CommandHandler("cancel", cancel_prompt_set, user_filter)
+    return ConversationHandler(
+        entry_points=[entry_handler],
+        states={INPUT_PROMPT_STATE: [new_prompt_handler, cancel_handler]},
+        fallbacks=[cancel_handler]
+    )
 
 
-async def prompt_reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def prompt_set(update: Update, _: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text("Input new prompt, or /cancel:")
+    return INPUT_PROMPT_STATE
+
+
+async def handle_new_prompt(update: Update, _: ContextTypes.DEFAULT_TYPE) -> int:
+    new_prompt = update.message.text
+    store_custom_prompt(update.effective_chat.id, new_prompt)
+    await update.message.reply_text(f"Prompt set to: {new_prompt}")
+    return ConversationHandler.END
+
+
+async def cancel_prompt_set(update: Update, _: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text("Prompt not changed.")
+    return ConversationHandler.END
+
+
+async def prompt_reset(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_chat.id
     reset_conversation(chat_id)
     remove_custom_prompt(chat_id)
-    await context.bot.send_message(chat_id=chat_id, text="Prompt reset.")
+    await update.message.reply_text("Prompt reset.")
 
 
-async def prompt_get(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    chat_id = update.effective_chat.id
-    custom_prompt = get_custom_prompt(chat_id)
+async def prompt_get(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    custom_prompt = get_custom_prompt(update.effective_chat.id)
     response = f"Prompt set to: {custom_prompt}" if custom_prompt else "No custom prompt configured."
-    await context.bot.send_message(chat_id=chat_id, text=response)
+    await update.message.reply_text(response)
 
 
-async def prompt_remove(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def prompt_remove(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_chat.id
     reset_conversation(chat_id)
     remove_prompt(chat_id)
-    await context.bot.send_message(chat_id=chat_id, text="Prompt removed.")
+    await update.message.reply_text("Prompt removed.")
+
+
+async def cancel(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("No operation to cancel.")
+
+
+async def talk(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    response = next_message(update.effective_chat.id, update.message.text)
+    await update.message.reply_text(response)
 
 
 if __name__ == "__main__":
