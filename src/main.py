@@ -3,11 +3,13 @@ from os import getenv
 
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler
+from telegram.ext.filters import COMMAND, TEXT
 
 from chat import (get_custom_prompt, initial_message, next_message, remove_custom_prompt, remove_prompt,
                   reset_conversation, store_custom_prompt)
 from rate_error_handler import rate_error_handler
+from user_filer import user_filter
 
 load_dotenv()
 
@@ -19,13 +21,13 @@ basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level
 def main() -> None:
     application = ApplicationBuilder().token(TOKEN).build()
 
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), talk))
-    application.add_handler(CommandHandler("reset", reset))
-    application.add_handler(CommandHandler("promptset", prompt_set))
-    application.add_handler(CommandHandler("promptreset", prompt_reset))
-    application.add_handler(CommandHandler("promptget", prompt_get))
-    application.add_handler(CommandHandler("promptremove", prompt_remove))
+    application.add_handler(CommandHandler("start", start, user_filter))
+    application.add_handler(MessageHandler(user_filter & TEXT & (~COMMAND), talk))
+    application.add_handler(CommandHandler("reset", reset, user_filter))
+    application.add_handler(CommandHandler("promptset", prompt_set, user_filter))
+    application.add_handler(CommandHandler("promptreset", prompt_reset, user_filter))
+    application.add_handler(CommandHandler("promptget", prompt_get, user_filter))
+    application.add_handler(CommandHandler("promptremove", prompt_remove, user_filter))
     application.add_error_handler(rate_error_handler)
 
     application.run_polling()

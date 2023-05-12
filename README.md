@@ -28,8 +28,13 @@ cp .env.example .env
 
 Only required parameter is a [bot token](https://core.telegram.org/bots#creating-a-new-bot).
 
+You can also restrict who can access the bot via `ALLOWED_USERNAMES`.
+You can specify multiple usernames delimited by space.
+If you don't want to restrict the bot at all you can remove this parameter or leave it empty.
+
 ```dotenv
 BOT_TOKEN='<your secret bot token>'
+ALLOWED_USERNAMES='myusername friendusername'
 ```
 
 
