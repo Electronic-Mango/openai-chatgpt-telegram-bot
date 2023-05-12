@@ -67,6 +67,7 @@ OPENAI_INITIAL_MESSAGE='You are a helpful assistant acting like 18th century but
 * `/promptget` - get custom prompt, won't respond with default one to avoid leaking configuration to users
 * `/promptremove` - force-remove any prompts from the conversation, including one defined in configuration files
 
+Note that `promptset` requires to pass the new prompt as a argument, which might not work well with command menu.
 
 
 ## Running the bot
