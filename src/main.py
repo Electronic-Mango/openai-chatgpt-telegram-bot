@@ -35,10 +35,9 @@ async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(message)
 
 
-async def restart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def restart(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     reset_conversation(update.effective_chat.id)
     await update.message.reply_text("Conversation restarted.")
-    await start(update, context)
 
 
 def prompt_set_handler() -> ConversationHandler:
