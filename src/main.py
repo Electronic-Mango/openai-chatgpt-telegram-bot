@@ -21,7 +21,7 @@ def main() -> None:
     bot.add_handler(CommandHandler("start", start, user_filter))
     bot.add_handler(CommandHandler("restart", restart, user_filter))
     bot.add_handler(prompt_set_handler())
-    bot.add_handler(CommandHandler("promptresetarg", prompt_reset, user_filter))
+    bot.add_handler(CommandHandler("promptreset", prompt_reset, user_filter))
     bot.add_handler(CommandHandler("promptget", prompt_get, user_filter))
     bot.add_handler(CommandHandler("promptremove", prompt_remove, user_filter))
     bot.add_handler(CommandHandler("cancel", cancel, user_filter))
