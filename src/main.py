@@ -8,7 +8,6 @@ from telegram.ext.filters import COMMAND, TEXT
 
 from chat import (get_custom_prompt, initial_message, next_message, remove_custom_prompt, remove_prompt,
                   reset_conversation, store_custom_prompt)
-from rate_error_handler import rate_error_handler
 from user_filer import user_filter
 
 INPUT_PROMPT_STATE, = range(1)
@@ -26,7 +25,6 @@ def main() -> None:
     bot.add_handler(CommandHandler("promptremove", prompt_remove, user_filter))
     bot.add_handler(CommandHandler("cancel", cancel, user_filter))
     bot.add_handler(MessageHandler(user_filter & TEXT & ~COMMAND, talk))
-    bot.add_error_handler(rate_error_handler)
     bot.run_polling()
 
 
