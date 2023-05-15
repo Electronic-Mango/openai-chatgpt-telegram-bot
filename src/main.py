@@ -11,7 +11,7 @@ from chat import (get_custom_prompt, initial_message, next_message, remove_custo
 from rate_error_handler import rate_error_handler
 from user_filer import user_filter
 
-INPUT_PROMPT_STATE = range(1)
+INPUT_PROMPT_STATE, = range(1)
 
 
 def main() -> None:
