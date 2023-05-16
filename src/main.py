@@ -1,9 +1,9 @@
-from logging import DEBUG, basicConfig
+from logging import INFO, basicConfig
 from os import getenv
 
 from dotenv import load_dotenv
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ConversationHandler, ContextTypes, MessageHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, ConversationHandler, MessageHandler
 from telegram.ext.filters import COMMAND, TEXT
 
 from chat import (get_custom_prompt, initial_message, next_message, remove_custom_prompt, remove_prompt,
@@ -15,7 +15,7 @@ INPUT_PROMPT_STATE, = range(1)
 
 def main() -> None:
     load_dotenv()
-    basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=DEBUG)
+    basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=INFO)
     bot = ApplicationBuilder().token(getenv("BOT_TOKEN")).build()
     bot.add_handler(CommandHandler("start", start, user_filter))
     bot.add_handler(CommandHandler("restart", restart, user_filter))

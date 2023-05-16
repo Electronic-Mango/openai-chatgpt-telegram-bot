@@ -22,6 +22,7 @@ conversations = defaultdict(list)
 custom_prompts = defaultdict(lambda: initial_prompt)
 
 openai.api_key = TOKEN
+openai.log = "debug"
 
 
 def initial_message(chat_id: int) -> str | None:
