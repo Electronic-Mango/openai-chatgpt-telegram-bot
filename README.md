@@ -32,9 +32,13 @@ You can also restrict who can access the bot via `ALLOWED_USERNAMES`.
 You can specify multiple usernames delimited by space.
 If you don't want to restrict the bot at all you can remove this parameter or leave it empty.
 
+You can also define max response length in characters via `MAX_MESSAGE_LENGTH`.
+Bot responses can be up to 4096 characters long, that value is used by default if this parameter is absent.
+
 ```dotenv
 BOT_TOKEN='<your secret bot token>'
 ALLOWED_USERNAMES='myusername friendusername'
+MAX_MESSAGE_LENGTH=<custom max response length>
 ```
 
 
