@@ -104,8 +104,21 @@ async def talk(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def send(message: str, update: Update) -> None:
-    for partial in wrap(message, int(getenv("MAX_MESSAGE_LENGTH", 4096))):
-        await update.message.reply_text(partial)
+    max_length = int(getenv("MAX_MESSAGE_LENGTH", 4096))
+    if len(message) <= max_length:
+        await update.message.reply_text(message.strip())
+        return
+    parts = wrap(
+        message,
+        max_length,
+        tabsize=4,
+        break_long_words=False,
+        replace_whitespace=False,
+        break_on_hyphens=False,
+        drop_whitespace=False,
+    )
+    for partial in parts:
+        await update.message.reply_text(partial.strip())
 
 
 if __name__ == "__main__":
