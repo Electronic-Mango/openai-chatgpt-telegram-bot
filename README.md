@@ -1,6 +1,6 @@
 # Simple OpenAI text model Telegram bot
 
-A simple Telegram bot wrapping [OpenAI API](https://openai.com/blog/openai-api/) text models (like [ChatGPT](https://openai.com/blog/chatgpt)), build with [`python-telegram-bot`](https://github.com/python-telegram-bot/python-telegram-bot)!
+A simple and unofficial Telegram bot wrapping [OpenAI API](https://openai.com/blog/openai-api/) text models (like [ChatGPT](https://openai.com/blog/chatgpt)), build with [`python-telegram-bot`](https://github.com/python-telegram-bot/python-telegram-bot)!
 
 Just start a conversation and all messages in the chat will be used as inputs for ChatGPT.
 
@@ -101,3 +101,11 @@ You can run the bot from the source code directly, or in a Docker container.
 
 Note that `.env` file is used only for loading environment variables into Docker container through compose.
 The file itself isn't added to the container.
+
+
+
+## Disclaimer
+
+This bot is in no way affiliated, associated, authorized, endorsed by, or in any way officially connected with JustWatch.
+This is an independent and unofficial project.
+Use at your own risk.
