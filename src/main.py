@@ -47,7 +47,7 @@ async def restart(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 def prompt_set_handler() -> ConversationHandler:
-    entry_handler = CommandHandler("promptset", prompt_set)
+    entry_handler = CommandHandler("promptset", prompt_set, user_filter)
     new_prompt_handler = MessageHandler(user_filter & TEXT & ~COMMAND, handle_new_prompt)
     cancel_handler = CommandHandler("cancel", cancel_prompt_set, user_filter)
     return ConversationHandler(
