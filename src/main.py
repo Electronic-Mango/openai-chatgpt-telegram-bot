@@ -37,7 +37,7 @@ def main() -> None:
 
 
 async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    message = initial_message(update.effective_chat.id)
+    message = await initial_message(update.effective_chat.id)
     await send(message, update)
 
 
@@ -99,7 +99,7 @@ async def cancel(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def talk(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-    response = next_message(update.effective_chat.id, update.message.text)
+    response = await next_message(update.effective_chat.id, update.message.text)
     await send(response, update)
 
 

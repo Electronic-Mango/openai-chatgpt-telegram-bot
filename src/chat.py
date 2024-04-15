@@ -2,13 +2,14 @@ from collections import defaultdict, namedtuple
 from os import getenv
 
 from dotenv import load_dotenv
-from openai import OpenAI, RateLimitError
+from openai import AsyncOpenAI, RateLimitError
 from openai.types.chat import ChatCompletion
 
 load_dotenv()
 
 Message = namedtuple("Message", ["role", "content"])
 
+START_PROMPT = "Show a welcome message explaining who you are and what you can do."
 RATE_LIMIT_MESSAGE = "Rate limit reached, try again in 20s."
 
 TOKEN = getenv("OPENAI_TOKEN")
@@ -21,19 +22,19 @@ initial_prompt = [Message("system", SYSTEM_MESSAGE), Message("user", INITIAL_MES
 conversations = defaultdict(list)
 custom_prompts = defaultdict(lambda: initial_prompt)
 
-client = OpenAI(api_key=TOKEN)
+client = AsyncOpenAI(api_key=TOKEN)
 
 
-def initial_message(chat_id: int) -> str | None:
-    return next_message(chat_id, "Show a welcome message explaining who you are and what you can do.", False)
+async def initial_message(chat_id: int) -> str | None:
+    return await next_message(chat_id, START_PROMPT, False)
 
 
-def next_message(chat_id: int, text: str, use_conversation: bool = True) -> str:
+async def next_message(chat_id: int, text: str, use_conversation: bool = True) -> str:
     prompt = custom_prompts[chat_id]
     conversation = conversations[chat_id] if use_conversation else []
     new_message = Message("user", text)
     messages = [message._asdict() for message in [*prompt, *conversation, new_message] if message.content]
-    response = _get_response(messages)
+    response = await _get_response(messages)
     if not response:
         return RATE_LIMIT_MESSAGE
     _store_message(conversation, new_message)
@@ -63,9 +64,9 @@ def get_custom_prompt(chat_id: int) -> str | None:
     return custom_prompts[chat_id][-1].content if chat_id in custom_prompts else None
 
 
-def _get_response(messages: list[dict[str, str]]) -> ChatCompletion | None:
+async def _get_response(messages: list[dict[str, str]]) -> ChatCompletion | None:
     try:
-        return client.chat.completions.create(model=MODEL, messages=messages)
+        return await client.chat.completions.create(model=MODEL, messages=messages)
     except RateLimitError:
         return None
 
