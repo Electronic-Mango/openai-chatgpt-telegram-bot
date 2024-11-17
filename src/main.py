@@ -1,11 +1,13 @@
+from base64 import b64encode
 from logging import INFO, basicConfig
+from mimetypes import guess_type
 from os import getenv
 from textwrap import wrap
 
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, ConversationHandler, MessageHandler
-from telegram.ext.filters import COMMAND, TEXT
+from telegram.ext.filters import COMMAND, TEXT, PHOTO
 
 from chat import (
     get_custom_prompt,
@@ -32,7 +34,8 @@ def main() -> None:
     bot.add_handler(CommandHandler("promptget", prompt_get, user_filter))
     bot.add_handler(CommandHandler("promptremove", prompt_remove, user_filter))
     bot.add_handler(CommandHandler("cancel", cancel, user_filter))
-    bot.add_handler(MessageHandler(user_filter & TEXT & ~COMMAND, talk))
+    bot.add_handler(MessageHandler(user_filter & TEXT & ~COMMAND, talk_text))
+    bot.add_handler(MessageHandler(user_filter & PHOTO & ~COMMAND, talk_photo))
     bot.run_polling()
 
 
@@ -98,8 +101,20 @@ async def cancel(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     await send("No operation to cancel.", update)
 
 
-async def talk(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+async def talk_text(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     response = await next_message(update.effective_chat.id, update.message.text)
+    await send(response, update)
+
+
+async def talk_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    text = update.message.caption
+    max_photo_size = max(update.message.photo, key=lambda p: p.file_size or 0)
+    file = await context.bot.get_file(max_photo_size)
+    file_byte_array = await file.download_as_bytearray()
+    image_b64 = b64encode(file_byte_array).decode("ascii")
+    image_type, _ = guess_type(file.file_path)
+    image_data = [f"data:{image_type};base64,{image_b64}"] if image_type else []
+    response = await next_message(update.effective_chat.id, text, image_data)
     await send(response, update)
 
 

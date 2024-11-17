@@ -106,6 +106,13 @@ The file itself isn't added to the container.
 
 
 
+## Vision
+
+Bot can respond to messages containing a **single** photo.
+Uploading more photos will result in bot responding to each one separately.
+Other messages than photo or text are ignored.
+
+
 ## Disclaimer
 
 This bot is in no way affiliated, associated, authorized, endorsed by, or in any way officially connected with OpenAI.
