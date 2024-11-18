@@ -6,6 +6,7 @@ from textwrap import wrap
 
 from dotenv import load_dotenv
 from telegram import Update
+from telegram.constants import ChatAction
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, ConversationHandler, MessageHandler
 from telegram.ext.filters import COMMAND, TEXT, PHOTO
 
@@ -40,6 +41,7 @@ def main() -> None:
 
 
 async def start(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.effective_chat.send_chat_action(ChatAction.TYPING)
     message = await initial_message(update.effective_chat.id)
     await send(message, update)
 
@@ -102,11 +104,13 @@ async def cancel(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def talk_text(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.effective_chat.send_chat_action(ChatAction.TYPING)
     response = await next_message(update.effective_chat.id, update.message.text)
     await send(response, update)
 
 
 async def talk_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.effective_chat.send_chat_action(ChatAction.TYPING)
     text = update.message.caption
     max_photo_size = max(update.message.photo, key=lambda p: p.file_size or 0)
     file = await context.bot.get_file(max_photo_size)
